@@ -1,8 +1,8 @@
 <?php
 include "koneksi.php"; 
 if (isset($_GET['kode_jurusan'])) {
-    $kode_mk = mysqli_real_escape_string($koneksi, $_GET['kode_jurusan']); 
-    $sql = "DELETE FROM tb_matakuliah WHERE kode_mk = '$kode_mk'"; 
+    $kode_jurusan = mysqli_real_escape_string($koneksi, $_GET['kode_jurusan']); 
+    $sql = "DELETE FROM tb_jurusan WHERE kode_jurusan = '$kode_jurusan'"; 
     $result = mysqli_query($koneksi, $sql);
 
     if ($result) {

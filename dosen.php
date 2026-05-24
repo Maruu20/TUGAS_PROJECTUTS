@@ -55,26 +55,37 @@
                                             <?php
                                             include "koneksi.php";
                                             
-                                            // Mengambil data dari tabel tb_dosen
-                                            $sql = "SELECT * FROM tb_dosen";
-                                            $result = mysqli_query($koneksi, $sql);
-                                            $no = 1; 
+                                            // Gunakan prepared statement untuk keamanan
+                                            $stmt = $koneksi->prepare("SELECT * FROM tb_dosen");
                                             
-                                            while($data = mysqli_fetch_array($result)) {
-                                            ?>
+                                            if (!$stmt) {
+                                                echo "<tr><td colspan='7' align='center'><strong>Error: " . $koneksi->error . "</strong></td></tr>";
+                                            } else {
+                                                $stmt->execute();
+                                                $result = $stmt->get_result();
+                                                $no = 1; 
+                                                
+                                                if ($result->num_rows === 0) {
+                                                    echo "<tr><td colspan='7' align='center'><strong>Data Dosen Kosong</strong></td></tr>";
+                                                } else {
+                                                    while($data = $result->fetch_array()) {
+                                                    ?>
                                             <tr>
                                                 <td align="center"><?php echo $no++; ?></td>
-                                                <td><?php echo $data['nidn']; ?></td>
-                                                <td><?php echo $data['nama']; ?></td>
-                                                <td><?php echo $data['email']; ?></td>
-                                                <td><?php echo $data['jenis_kelamin']; ?></td>
-                                                <td><?php echo $data['telepon']; ?></td>
+                                                <td><?php echo htmlspecialchars($data['nidn']); ?></td>
+                                                <td><?php echo htmlspecialchars($data['nama']); ?></td>
+                                                <td><?php echo htmlspecialchars($data['email']); ?></td>
+                                                <td><?php echo htmlspecialchars($data['jenis_kelamin']); ?></td>
+                                                <td><?php echo htmlspecialchars($data['telepon']); ?></td>
                                                 <td align="center">
-                                                    <a href="dosenEdit.php?nidn=<?php echo $data['nidn']; ?>" class="btn btn-warning btn-xs">Edit</a>
-                                                    <a href="dosenHapus.php?nidn=<?php echo $data['nidn']; ?>" class="btn btn-danger btn-xs" onclick="return confirm('Yakin ingin menghapus data dosen ini?')">Hapus</a>
+                                                    <a href="dosenEdit.php?nidn=<?php echo urlencode($data['nidn']); ?>" class="btn btn-warning btn-xs">Edit</a>
+                                                    <a href="dosenHapus.php?nidn=<?php echo urlencode($data['nidn']); ?>" class="btn btn-danger btn-xs" onclick="return confirm('Yakin ingin menghapus data dosen ini?')">Hapus</a>
                                                 </td>
                                             </tr>
                                             <?php
+                                                    }
+                                                }
+                                                $stmt->close();
                                             }
                                             ?>
                                         </tbody>

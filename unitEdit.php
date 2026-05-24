@@ -33,7 +33,7 @@ if (isset($_POST['update'])) {
                                 <form method="POST">
                                     <div class="form-group">
                                         <label><strong>Input Kode Unit</strong></label>
-                                        <input class="form-control" name="kode_unit" value="<?php echo $data['kode_unit']; ?>" require>
+                                        <input class="form-control" name="kode_unit" value="<?php echo $data['kode_unit']; ?>" readonly>
                                     </div>
                                     <div class="form-group">
                                         <label><strong>Input Nama Unit</strong></label>

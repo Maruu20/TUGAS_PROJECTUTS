@@ -1,19 +1,26 @@
 <?php
 include "koneksi.php";
 
-if (isset($_GET['nidn'])) {
-    $nidn_get = $_GET['nidn'];
+if (isset($_GET['nidn']) && !empty($_GET['nidn'])) {
+    $nidn_get = trim($_GET['nidn']);
 
-    // Query hapus data berdasarkan nidn
-    $query = mysqli_query($koneksi, "DELETE FROM tb_dosen WHERE nidn = '$nidn_get'");
-
-    if ($query) {
-        echo "<script>alert('Data Dosen Berhasil Dihapus!'); window.location='dosen.php';</script>";
+    // Gunakan prepared statement untuk DELETE
+    $stmt = $koneksi->prepare("DELETE FROM tb_dosen WHERE nidn = ?");
+    
+    if (!$stmt) {
+        echo "<script>alert('Error prepare: " . $koneksi->error . "'); window.location='dosen.php';</script>";
     } else {
-        echo "<script>alert('Gagal Hapus Data: " . mysqli_error($koneksi) . "'); window.location='dosen.php';</script>";
+        $stmt->bind_param("s", $nidn_get);
+
+        if ($stmt->execute()) {
+            echo "<script>alert('Data Dosen Berhasil Dihapus!'); window.location='dosen.php';</script>";
+        } else {
+            echo "<script>alert('Gagal Hapus Data: " . $stmt->error . "'); window.location='dosen.php';</script>";
+        }
+        $stmt->close();
     }
 } else {
-    // Jika diakses tanpa parameter langsung kembalikan ke halaman utama
     header("Location: dosen.php");
+    exit;
 }
 ?>

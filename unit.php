@@ -1,101 +1,79 @@
-<?php
-include "koneksi.php";
-
-$kode_get = $_GET['kode_mk'];
-$data = mysqli_fetch_array(mysqli_query($koneksi, "SELECT * FROM tb_matakuliah WHERE kode_mk='$kode_get'"));
-
-if (isset($_POST['update'])) {
-    $nama_mk      = $_POST['nama_mk'];
-    $sks          = $_POST['sks'];
-    $semester     = $_POST['semester'];
-    $kode_jurusan = $_POST['kode_jurusan']; // Menangkap perubahan jurusan dari dropdown
-
-    // Query UPDATE termasuk mengubah kolom kode_jurusan
-    $query = mysqli_query($koneksi, "UPDATE tb_matakuliah SET 
-        nama_mk      = '$nama_mk', 
-        sks          = '$sks', 
-        semester     = '$semester',
-        kode_jurusan = '$kode_jurusan' 
-        WHERE kode_mk = '$kode_get'");
-    
-    if ($query) { 
-        echo "<script>alert('Data Matakuliah Berhasil Diupdate'); window.location='matakuliah.php';</script>"; 
-    } else {
-        echo "<script>alert('Gagal Update: " . mysqli_error($koneksi) . "');</script>";
-    }
-}
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIAKAD - Edit Matakuliah</title>
+    <title>Data Unit</title>
+
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/metisMenu.min.css" rel="stylesheet">
+    <link href="css/timeline.css" rel="stylesheet">
     <link href="css/startmin.css" rel="stylesheet">
     <link href="css/font-awesome.min.css" rel="stylesheet" type="text/css">
 </head>
-
 <body>
     <div id="wrapper">
-        <?php include "navbar.php"; include "sidebar.php"; ?>
+        <?php
+            include "navbar.php";
+            include "sidebar.php";
+        ?>
 
         <div id="page-wrapper">
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-lg-12">
-                        <h1 class="page-header">Form Matakuliah Edit</h1>
+                        <h1 class="page-header">Dashboard</h1>
                     </div>
                 </div>
 
                 <div class="row">
                     <div class="col-lg-12">
+                        <h3>Data Unit</h3>
+                        
                         <div style="margin-bottom: 15px;">
-                            <a href="matakuliahAdd.php" class="btn btn-danger">Matakuliah Add</a>
+                            <a href="unitAdd.php" class="btn btn-danger">Tambah Unit</a>
                         </div>
 
                         <div class="panel panel-danger">
-                            <div class="panel-heading">Form Matakuliah Edit</div>
+                            <div class="panel-heading">
+                                Tabel Data Unit
+                            </div>
                             <div class="panel-body">
-                                <form method="POST">
-                                    <div class="form-group">
-                                        <label><strong>Input Kode MK</strong></label>
-                                        <input type="text" class="form-control" name="kode_mk" value="<?php echo $data['kode_mk']; ?>" readonly />
-                                    </div>
-                                    <div class="form-group">
-                                        <label><strong>Input Nama MK</strong></label>
-                                        <input type="text" class="form-control" name="nama_mk" value="<?php echo $data['nama_mk']; ?>" required />
-                                    </div>
-                                    <div class="form-group">
-                                        <label><strong>Input SKS</strong></label>
-                                        <input type="number" class="form-control" name="sks" value="<?php echo $data['sks']; ?>" required />
-                                    </div>
-                                    <div class="form-group">
-                                        <label><strong>Input Semester</strong></label>
-                                        <input type="number" class="form-control" name="semester" value="<?php echo $data['semester']; ?>" required />
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label><strong>Pilih Jurusan</strong></label>
-                                        <select class="form-control" name="kode_jurusan" required>
-                                            <option value="">-- Pilih Jurusan --</option>
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-bordered table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th width="50px">No</th>
+                                                <th>Kode Unit</th>
+                                                <th>Nama Unit</th>
+                                                <th width="150px">Aksi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
                                             <?php
-                                            $sql_jurusan = mysqli_query($koneksi, "SELECT * FROM tb_jurusan");
-                                            while ($jurusan = mysqli_fetch_array($sql_jurusan)) {
-                                                // Logika selected untuk mengunci jurusan yang sudah diinput sebelumnya
-                                                $selected = ($jurusan['kode_jurusan'] == $data['kode_jurusan']) ? 'selected' : '';
-                                                
-                                                echo "<option value='" . $jurusan['kode_jurusan'] . "' $selected>" . $jurusan['kode_jurusan'] . " - " . $jurusan['nama_jurusan'] . "</option>";
+                                            include "koneksi.php";
+                                            
+                                            $sql = "SELECT * FROM tb_unit";
+                                            $result = mysqli_query($koneksi, $sql);
+                                            $no = 1; 
+                                            
+                                            while($data = mysqli_fetch_array($result)) {
+                                            ?>
+                                            <tr>
+                                                <td align="center"><?php echo $no++; ?></td>
+                                                <td><?php echo htmlspecialchars($data['kode_unit']); ?></td>
+                                                <td><?php echo htmlspecialchars($data['nama_unit']); ?></td>
+                                                <td align="center">
+                                                    <a href="unitEdit.php?kode_unit=<?php echo urlencode($data['kode_unit']); ?>" class="btn btn-warning btn-xs">Edit</a>
+                                                    <a href="unitHapus.php?kode_unit=<?php echo urlencode($data['kode_unit']); ?>" class="btn btn-danger btn-xs" onclick="return confirm('Yakin ingin menghapus data unit ini?')">Hapus</a>
+                                                </td>
+                                            </tr>
+                                            <?php
                                             }
                                             ?>
-                                        </select>
-                                    </div>
-                                    
-                                    <button type="submit" class="btn btn-danger" name="update">Simpan</button>
-                                    <a href="matakuliah.php" class="btn btn-warning">Kembali</a>
-                                </form>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>

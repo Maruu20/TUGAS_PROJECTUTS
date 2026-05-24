@@ -1,22 +1,72 @@
 <?php
 include "koneksi.php";
 
-$nidn_get = $_GET['nidn'];
-$data = mysqli_fetch_array(mysqli_query($koneksi, "SELECT * FROM tb_dosen WHERE nidn='$nidn_get'"));
+if (!isset($_GET['nidn']) || empty($_GET['nidn'])) {
+    header("Location: dosen.php");
+    exit;
+}
+
+$nidn_get = trim($_GET['nidn']);
+
+// Gunakan prepared statement untuk SELECT
+$stmt = $koneksi->prepare("SELECT * FROM tb_dosen WHERE nidn = ?");
+
+if (!$stmt) {
+    echo "<script>alert('Error prepare SELECT: " . $koneksi->error . "'); window.location='dosen.php';</script>";
+    exit;
+}
+
+$stmt->bind_param("s", $nidn_get);
+$stmt->execute();
+$result = $stmt->get_result();
+$data = $result->fetch_array();
+$stmt->close();
+
+if (!$data) {
+    echo "<script>alert('Data dosen tidak ditemukan!'); window.location='dosen.php';</script>";
+    exit;
+}
 
 if (isset($_POST['update'])) {
-    $nama          = $_POST['nama'];
-    $email         = $_POST['email'];
-    $jenis_kelamin = $_POST['jenis_kelamin'];
-    $telepon       = $_POST['telepon'];
+    $nama          = isset($_POST['nama']) ? trim($_POST['nama']) : "";
+    $email         = isset($_POST['email']) ? trim($_POST['email']) : "";
+    $jenis_kelamin = isset($_POST['jenis_kelamin']) ? trim($_POST['jenis_kelamin']) : "";
+    $telepon       = isset($_POST['telepon']) ? trim($_POST['telepon']) : "";
 
-    // Proses Update ke tabel tb_dosen
-    $query = mysqli_query($koneksi, "UPDATE tb_dosen SET nama='$nama', email='$email', jenis_kelamin='$jenis_kelamin', telepon='$telepon' WHERE nidn='$nidn_get'");
+    $error = "";
     
-    if ($query) { 
-        echo "<script>alert('Data Dosen Berhasil Diupdate'); window.location='dosen.php';</script>"; 
+    // Validasi input
+    if (empty($nama)) {
+        $error = "Nama Dosen harus diisi!";
+    } else if (empty($email)) {
+        $error = "Email harus diisi!";
+    } else if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $error = "Format email tidak valid!";
+    } else if (empty($jenis_kelamin) || $jenis_kelamin === "") {
+        $error = "Jenis Kelamin harus dipilih!";
+    } else if (empty($telepon)) {
+        $error = "Telepon harus diisi!";
     } else {
-        echo "<script>alert('Gagal Update: " . mysqli_error($koneksi) . "');</script>";
+        // Gunakan prepared statement untuk UPDATE
+        $stmt = $koneksi->prepare("UPDATE tb_dosen SET nama=?, email=?, jenis_kelamin=?, telepon=? WHERE nidn=?");
+        
+        if (!$stmt) {
+            $error = "Error prepare UPDATE: " . $koneksi->error;
+        } else {
+            $stmt->bind_param("sssss", $nama, $email, $jenis_kelamin, $telepon, $nidn_get);
+            
+            if ($stmt->execute()) {
+                echo "<script>alert('Data Dosen Berhasil Diupdate'); window.location='dosen.php';</script>";
+                exit;
+            } else {
+                $error = "Gagal Update: " . $stmt->error;
+            }
+            $stmt->close();
+        }
+    }
+    
+    if ($error) {
+        echo "<script>alert('" . addslashes($error) . "'); </script>";
     }
 }
 ?>
@@ -44,15 +94,15 @@ if (isset($_POST['update'])) {
                                 <form method="POST">
                                     <div class="form-group">
                                         <label><strong>Input NIDN</strong></label>
-                                        <input class="form-control" name="nidn" value="<?php echo $data['nidn']; ?>" readonly>
+                                        <input class="form-control" name="nidn" value="<?php echo htmlspecialchars($data['nidn']); ?>" readonly>
                                     </div>
                                     <div class="form-group">
                                         <label><strong>Input Nama Dosen</strong></label>
-                                        <input class="form-control" name="nama" value="<?php echo $data['nama']; ?>" required>
+                                        <input class="form-control" name="nama" value="<?php echo htmlspecialchars($data['nama']); ?>" required>
                                     </div>
                                     <div class="form-group">
                                         <label><strong>Input Email</strong></label>
-                                        <input type="email" class="form-control" name="email" value="<?php echo $data['email']; ?>" required>
+                                        <input type="email" class="form-control" name="email" value="<?php echo htmlspecialchars($data['email']); ?>" required>
                                     </div>
                                     <div class="form-group">
                                         <label><strong>Input Jenis Kelamin</strong></label>
@@ -63,7 +113,7 @@ if (isset($_POST['update'])) {
                                     </div>
                                     <div class="form-group">
                                         <label><strong>Input Telepon</strong></label>
-                                        <input class="form-control" name="telepon" value="<?php echo $data['telepon']; ?>" required>
+                                        <input class="form-control" name="telepon" value="<?php echo htmlspecialchars($data['telepon']); ?>" required>
                                     </div>
                                     <button type="submit" name="update" class="btn btn-danger">Simpan</button>
                                     <a href="dosen.php" class="btn btn-warning">Kembali</a>
