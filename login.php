@@ -1,13 +1,13 @@
 <?php
-// Mulai sesi
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
+include "koneksi.php";
+
+if(isset($_SESSION['username']) || isset($_SESSION['password'])) {
+    header("Location: index.php");
+    exit;
 }
 
 $error = "";
 
-// Sertakan koneksi.php (yang nanti akan diproteksi)
-include "koneksi.php";
 
 // Jika sudah login, alihkan ke dashboard index.php
 if (isset($_SESSION['user_id'])) {
