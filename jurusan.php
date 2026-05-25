@@ -1,3 +1,6 @@
+<?php
+include "koneksi.php";
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -52,8 +55,6 @@
                                         </thead>
                                         <tbody>
                                             <?php
-                                            include "koneksi.php";
-                                            
                                             // Query mengambil data dari tabel tb_jurusan
                                             $sql = "SELECT * FROM tb_jurusan";
                                             $result = mysqli_query($koneksi, $sql);

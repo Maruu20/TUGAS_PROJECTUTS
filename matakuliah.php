@@ -1,3 +1,6 @@
+<?php
+include "koneksi.php";
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -63,7 +66,6 @@
                                         </thead>
                                         <tbody>
                                             <?php
-                                            include "koneksi.php";
                                             
                                             $sql = "SELECT * FROM tb_matakuliah";
                                             $result = mysqli_query($koneksi, $sql);

@@ -2,7 +2,7 @@
 
      echo "<h1>Hallo PHP</h1>";
 
-     $nama = "<h2>Ririn</h2>";
+     $nama = "<h2>Maru</h2>";
      echo $nama;
 
      $n1 = 18;

@@ -1,3 +1,6 @@
+<?php
+include "koneksi.php";
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,7 +10,6 @@
 
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/metisMenu.min.css" rel="stylesheet">
-    <link href="css/timeline.css" rel="stylesheet">
     <link href="css/startmin.css" rel="stylesheet">
     <link href="css/font-awesome.min.css" rel="stylesheet" type="text/css">
 </head>
@@ -51,21 +53,21 @@
                                         </thead>
                                         <tbody>
                                             <?php
-                                            include "koneksi.php";
-                                            
-                                            $sql = "SELECT * FROM tb_unit";
+                                            // Mengambil data dari tabel tb_unit sesuai gambar database
+                                            $sql = "SELECT * FROM tb_unit"; 
                                             $result = mysqli_query($koneksi, $sql);
                                             $no = 1; 
                                             
+                                            // Menampilkan data menggunakan while loop
                                             while($data = mysqli_fetch_array($result)) {
                                             ?>
                                             <tr>
                                                 <td align="center"><?php echo $no++; ?></td>
-                                                <td><?php echo htmlspecialchars($data['kode_unit']); ?></td>
-                                                <td><?php echo htmlspecialchars($data['nama_unit']); ?></td>
+                                                <td><?php echo $data['kode_unit']; ?></td>
+                                                <td><?php echo $data['nama_unit']; ?></td>
                                                 <td align="center">
-                                                    <a href="unitEdit.php?kode_unit=<?php echo urlencode($data['kode_unit']); ?>" class="btn btn-warning btn-xs">Edit</a>
-                                                    <a href="unitHapus.php?kode_unit=<?php echo urlencode($data['kode_unit']); ?>" class="btn btn-danger btn-xs" onclick="return confirm('Yakin ingin menghapus data unit ini?')">Hapus</a>
+                                                    <a href="unitEdit.php?kode_unit=<?php echo $data['kode_unit']; ?>" class="btn btn-warning btn-xs">Edit</a>
+                                                    <a href="unitHapus.php?kode_unit=<?php echo $data['kode_unit']; ?>" class="btn btn-danger btn-xs" onclick="return confirm('Yakin ingin menghapus unit ini?')">Hapus</a>
                                                 </td>
                                             </tr>
                                             <?php

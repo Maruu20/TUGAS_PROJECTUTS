@@ -1,3 +1,6 @@
+<?php
+include "koneksi.php";
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -53,8 +56,6 @@
                                         </thead>
                                         <tbody>
                                             <?php
-                                            include "koneksi.php";
-                                            
                                             // Gunakan prepared statement untuk keamanan
                                             $stmt = $koneksi->prepare("SELECT * FROM tb_dosen");
                                             
